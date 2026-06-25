@@ -12,4 +12,5 @@ export type PredictionData = {
     insight: string;
   };
   motivo_alteracao?: string;
+  source?: "ai" | "heuristic";
 };

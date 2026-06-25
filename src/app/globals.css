@@ -159,6 +159,20 @@
 ::-webkit-scrollbar-thumb { background: rgba(31, 41, 55, 0.22); border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(31, 41, 55, 0.34); }
 
+body [data-nextjs-toast],
+body [data-nextjs-dev-overlay],
+body [id*="nextjs"],
+body [class*="nextjs"],
+body > nextjs-portal,
+body > div[style*="z-index: 9999"],
+body > div[style*="z-index: 999"],
+body > div[style*="z-index: 1000"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 * { scrollbar-width: thin; scrollbar-color: rgba(31, 41, 55, 0.24) transparent; }
 
 @layer base {

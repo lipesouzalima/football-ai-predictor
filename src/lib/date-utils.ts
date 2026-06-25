@@ -1,7 +1,12 @@
 const BRAZIL_TIME_ZONE = "America/Sao_Paulo";
 
-export function getBrazilDateParts(date: Date | string) {
+function toBrazilDate(date: Date | string) {
   const value = typeof date === "string" ? new Date(date) : date;
+  return new Date(value.toLocaleString("en-US", { timeZone: BRAZIL_TIME_ZONE }));
+}
+
+export function getBrazilDateParts(date: Date | string) {
+  const value = toBrazilDate(date);
   const formatter = new Intl.DateTimeFormat("en-CA", {
     timeZone: BRAZIL_TIME_ZONE,
     year: "numeric",
@@ -20,7 +25,7 @@ export function formatKickoffInBrazil(date: string) {
     timeZone: BRAZIL_TIME_ZONE,
     hour: "2-digit",
     minute: "2-digit",
-  }).format(new Date(date));
+  }).format(toBrazilDate(date));
 }
 
 export function formatMatchDateInBrazil(date: string) {
@@ -30,7 +35,7 @@ export function formatMatchDateInBrazil(date: string) {
     day: "2-digit",
     month: "short",
   })
-    .format(new Date(date))
+    .format(toBrazilDate(date))
     .replace(".", "");
 }
 
@@ -40,7 +45,7 @@ export function formatBrazilDateLong(date = new Date()) {
     year: "numeric",
     month: "long",
     day: "numeric",
-  }).format(date);
+  }).format(toBrazilDate(date));
 }
 
 export function normalizeDateToBrazilIso(input: string) {
@@ -52,7 +57,8 @@ export function normalizeDateToBrazilIso(input: string) {
 
   const parsed = new Date(trimmed);
   if (!Number.isNaN(parsed.getTime())) {
-    return parsed.toISOString();
+    const normalized = new Date(parsed.toLocaleString("en-US", { timeZone: BRAZIL_TIME_ZONE }));
+    return normalized.toISOString();
   }
 
   return trimmed;

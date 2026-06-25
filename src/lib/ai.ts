@@ -69,12 +69,29 @@ type CachedPrediction = {
   data: PredictionData;
 };
 
+function isUsablePrediction(data: PredictionData | undefined | null): data is PredictionData {
+  if (!data) return false;
+  if (data.source && data.source !== "ai") return false;
+  return Boolean(
+    data.previsao &&
+    Number.isFinite(data.previsao.gols_time_casa) &&
+    Number.isFinite(data.previsao.gols_time_fora) &&
+    Number.isFinite(data.previsao.confianca_percentual)
+  );
+}
+
 function readPredictionCache(matchId: string): PredictionData | null {
   try {
     if (!fs.existsSync(PREDICTION_CACHE_FILE)) return null;
     const raw = fs.readFileSync(PREDICTION_CACHE_FILE, "utf-8");
     const parsed = JSON.parse(raw) as CachedPrediction[];
-    const entry = parsed.find((item) => item.matchId === matchId);
+    const validEntries = parsed.filter((item) => isUsablePrediction(item.data));
+
+    if (validEntries.length !== parsed.length) {
+      fs.writeFileSync(PREDICTION_CACHE_FILE, JSON.stringify(validEntries, null, 2), "utf-8");
+    }
+
+    const entry = validEntries.find((item) => item.matchId === matchId);
     if (!entry) return null;
     if (Date.now() - entry.timestamp > PREDICTION_CACHE_TTL_MS) return null;
     return entry.data;
@@ -145,6 +162,7 @@ function buildHeuristicPrediction(match: Match): PredictionData {
       insight: `O protagonista tende a ser o jogador mais decisivo do elenco principal, especialmente em uma partida em que a casa pode decidir a diferença.`,
     },
     motivo_alteracao: "A análise de apoio foi usada porque a IA principal não respondeu com a qualidade esperada; a leitura ficou mais conservadora e alinhada ao contexto do jogo.",
+    source: "heuristic",
   };
 }
 
@@ -244,6 +262,7 @@ Regras:
       return {
         ...parsed,
         motivo_alteracao: parsed.motivo_alteracao?.trim() || "Previsão mantida sem sinais novos o suficiente para alterar o palpite.",
+        source: "ai",
       };
     } catch (error) {
       lastError = error;
@@ -265,6 +284,8 @@ export async function getPrediction(match: Match, forceRefresh = false): Promise
 
   const previousPrediction = forceRefresh ? undefined : readPredictionCache(match.id) ?? undefined;
   const prediction = await generatePrediction(match, previousPrediction);
-  writePredictionCache(match.id, prediction);
+  if (prediction.source === "ai") {
+    writePredictionCache(match.id, prediction);
+  }
   return prediction;
 }

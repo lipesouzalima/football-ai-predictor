@@ -1,7 +1,7 @@
 import { MOCK_MATCHES, Match } from "@/lib/data";
 import { MatchCard } from "@/components/match/MatchCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getBrazilDateParts, getTodayInBrazil } from "@/lib/date-utils";
+import { formatMatchDateInBrazil, getBrazilDateParts, getTodayInBrazil } from "@/lib/date-utils";
 import { CalendarDays, RadioTower, Sparkles } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -19,6 +19,15 @@ function byKickoff(a: Match, b: Match) {
   return new Date(a.date).getTime() - new Date(b.date).getTime();
 }
 
+function groupMatchesByDay(matches: Match[]) {
+  return matches.reduce<Record<string, Match[]>>((acc, match) => {
+    const day = getBrazilDateParts(match.date);
+    if (!acc[day]) acc[day] = [];
+    acc[day].push(match);
+    return acc;
+  }, {});
+}
+
 export default async function Home() {
   const matches = (await getMatchData()).sort(byKickoff);
   const todayStr = getTodayInBrazil();
@@ -26,6 +35,7 @@ export default async function Home() {
   const previousMatches = matches.filter((m) => getBrazilDateParts(m.date) < todayStr);
   const todayMatches = matches.filter((m) => getBrazilDateParts(m.date) === todayStr);
   const nextMatches = matches.filter((m) => getBrazilDateParts(m.date) > todayStr);
+  const groupedNextMatches = groupMatchesByDay(nextMatches);
 
   return (
     <main className="app-shell selection:bg-indigo-200/80">
@@ -35,8 +45,12 @@ export default async function Home() {
 
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-3xl flex-col px-4 pb-16 pt-8 sm:px-6 md:pt-12">
         <header className="animate-fade-in mb-8">
-          <div className="surface-container rounded-[2rem] p-5 sm:p-6">
-            <div className="flex items-start justify-between gap-5">
+          <div className="surface-container relative overflow-hidden rounded-[2rem] p-5 sm:p-6">
+            <div className="pointer-events-none absolute inset-0">
+              <Sparkles className="absolute -right-2 top-4 h-24 w-24 text-slate-950/8" />
+              <Sparkles className="absolute bottom-3 left-1/2 h-20 w-20 -translate-x-1/2 text-slate-950/7" />
+            </div>
+            <div className="relative z-10 flex items-start justify-between gap-5">
               <div>
                 <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-slate-600 shadow-sm ring-1 ring-white/70">
                   <RadioTower className="h-3.5 w-3.5 text-fuchsia-500" />
@@ -48,13 +62,6 @@ export default async function Home() {
                 <p className="mt-4 max-w-lg text-base font-bold leading-relaxed text-slate-600 sm:text-lg">
                   Um app feito pra te ajudar a apostar certeiro com ajuda da IA - criado por Felipe Lima.
                 </p>
-              </div>
-              <div className="relative hidden h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-[1.8rem] border border-white/60 bg-white/35 shadow-2xl sm:flex">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.7),transparent_45%)]" />
-                <Sparkles className="absolute left-3 top-4 h-7 w-7 text-slate-950/12" />
-                <Sparkles className="absolute bottom-4 right-3 h-8 w-8 text-slate-950/10" />
-                <Sparkles className="absolute right-2 top-2 h-5 w-5 text-slate-950/12" />
-                <Sparkles className="h-8 w-8 text-amber-400" />
               </div>
             </div>
           </div>
@@ -95,7 +102,20 @@ export default async function Home() {
                 {nextMatches.length === 0 ? (
                   <EmptyState text="Nenhum próximo jogo encontrado." />
                 ) : (
-                  nextMatches.map((match) => <MatchCard key={match.id} match={match} />)
+                  Object.entries(groupedNextMatches).map(([day, dayMatches]) => (
+                    <div key={day} className="space-y-3">
+                      <div className="flex items-center gap-3 px-1">
+                        <div className="h-px flex-1 bg-slate-900/10" />
+                        <span className="text-[0.7rem] font-black uppercase tracking-[0.22em] text-slate-500">
+                          {formatMatchDateInBrazil(`${day}T12:00:00-03:00`)}
+                        </span>
+                        <div className="h-px flex-1 bg-slate-900/10" />
+                      </div>
+                      {dayMatches.map((match) => (
+                        <MatchCard key={match.id} match={match} />
+                      ))}
+                    </div>
+                  ))
                 )}
               </TabsContent>
             </div>

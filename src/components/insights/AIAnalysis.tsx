@@ -5,7 +5,7 @@ import { Activity, Brain, HeartPulse, Lightbulb, TrendingUp, User } from "lucide
 import { PredictionData } from "@/lib/prediction-types";
 
 const cardBase =
-  "rounded-[1.8rem] bg-white/78 p-5 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.55)] ring-1 ring-slate-950/[0.06] backdrop-blur-xl";
+  "rounded-[1.8rem] border border-slate-900/10 bg-white/95 p-5 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.55)] backdrop-blur-xl";
 
 const insights = [
   {
