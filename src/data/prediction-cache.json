@@ -1,0 +1,59 @@
+[
+  {
+    "timestamp": 1782411637613,
+    "matchId": "wc2026_20260625_ECU_GER_6",
+    "data": {
+      "previsao": {
+        "gols_time_casa": 1,
+        "gols_time_fora": 1,
+        "confianca_percentual": 50
+      },
+      "analise_matematica_grupo": "Dados insuficientes no momento devido a um erro de comunicação com a IA.",
+      "impacto_desfalques": "Sem informações reportadas.",
+      "consenso_mercado": "Indefinido.",
+      "jogador_chave": {
+        "nome": "N/A",
+        "insight": "Aguardando nova análise."
+      },
+      "motivo_alteracao": "Previsão mantida por falta de sinais novos suficientes para alterar o palpite."
+    }
+  },
+  {
+    "timestamp": 1782411664102,
+    "matchId": "wc2026_20260625_CUW_CIV_7",
+    "data": {
+      "previsao": {
+        "gols_time_casa": 1,
+        "gols_time_fora": 1,
+        "confianca_percentual": 50
+      },
+      "analise_matematica_grupo": "Dados insuficientes no momento devido a um erro de comunicação com a IA.",
+      "impacto_desfalques": "Sem informações reportadas.",
+      "consenso_mercado": "Indefinido.",
+      "jogador_chave": {
+        "nome": "N/A",
+        "insight": "Aguardando nova análise."
+      },
+      "motivo_alteracao": "Previsão mantida por falta de sinais novos suficientes para alterar o palpite."
+    }
+  },
+  {
+    "timestamp": 1782412039215,
+    "matchId": "wc2026_20260625_JPN_SWE_8",
+    "data": {
+      "previsao": {
+        "gols_time_casa": 2,
+        "gols_time_fora": 1,
+        "confianca_percentual": 66
+      },
+      "analise_matematica_grupo": "A leitura de apoio aponta um jogo com ligeira vantagem para Japan em casa, com equilíbrio suficiente para que o resultado fique aberto até os minutos finais.",
+      "impacto_desfalques": "Sem um boletim oficial completo, a leitura base assume que a escalação principal permanece próxima do esperado e que o contexto tático pesa mais do que o nome isolado.",
+      "consenso_mercado": "O cenário mais provável é um jogo equilibrado, com pequena vantagem do mandante quando os detalhes de escalação não mudam o contexto do duelo.",
+      "jogador_chave": {
+        "nome": "Japan",
+        "insight": "O protagonista tende a ser o jogador mais decisivo do elenco principal, especialmente em uma partida em que a casa pode decidir a diferença."
+      },
+      "motivo_alteracao": "A análise de apoio foi usada porque a IA principal não respondeu com a qualidade esperada; a leitura ficou mais conservadora e alinhada ao contexto do jogo."
+    }
+  }
+]
