@@ -130,36 +130,48 @@ function buildHeuristicPrediction(match: Match): PredictionData {
 
   let homeGoals = 1;
   let awayGoals = 1;
+  let confidence = 66;
+  let reason = `A leitura de apoio aponta um confronto equilibrado entre ${match.homeTeam.name} e ${match.awayTeam.name}, com leve vantagem para o mandante quando o contexto tático pesa mais que o nome isolado.`;
 
   if (edge >= 3) {
     homeGoals = 2;
     awayGoals = 0;
+    confidence = 74;
+    reason = `${match.homeTeam.name} entra como favorito claro no papel, com superioridade de elenco e vantagem de atuar em casa.`;
   } else if (edge >= 2) {
     homeGoals = 2;
     awayGoals = 1;
+    confidence = 72;
+    reason = `${match.homeTeam.name} tem vantagem suficiente para controlar o jogo, mas o duelo ainda deve ficar aberto pela qualidade do rival.`;
   } else if (edge >= 1) {
     homeGoals = 2;
     awayGoals = 1;
+    confidence = 68;
+    reason = `O jogo deve ficar em um cenário de equilíbrio com pequena vantagem do mandante, especialmente pela casa e pela dinâmica de ataque.`;
   } else if (edge <= -2) {
     homeGoals = 0;
     awayGoals = 2;
+    confidence = 70;
+    reason = `${match.awayTeam.name} chega com melhor leitura de jogo e pode explorar a pressão do mandante em fases de transição.`;
   } else {
     homeGoals = 1;
     awayGoals = 1;
+    confidence = 64;
+    reason = `O duelo parece muito parelho e tende a se decidir por detalhes, com pouca margem para grandes diferenças de resultado.`;
   }
 
   return {
     previsao: {
       gols_time_casa: homeGoals,
       gols_time_fora: awayGoals,
-      confianca_percentual: 66,
+      confianca_percentual: confidence,
     },
-    analise_matematica_grupo: `A leitura de apoio aponta um jogo com ligeira vantagem para ${match.homeTeam.name} em casa, com equilíbrio suficiente para que o resultado fique aberto até os minutos finais.`,
+    analise_matematica_grupo: reason,
     impacto_desfalques: `Sem um boletim oficial completo, a leitura base assume que a escalação principal permanece próxima do esperado e que o contexto tático pesa mais do que o nome isolado.`,
     consenso_mercado: `O cenário mais provável é um jogo equilibrado, com pequena vantagem do mandante quando os detalhes de escalação não mudam o contexto do duelo.`,
     jogador_chave: {
       nome: match.homeTeam.name,
-      insight: `O protagonista tende a ser o jogador mais decisivo do elenco principal, especialmente em uma partida em que a casa pode decidir a diferença.`,
+      insight: `O nome mais provável para decidir a partida é o jogador principal da equipe da casa, especialmente em um jogo em que a organização ofensiva pode definir a diferença.`,
     },
     motivo_alteracao: "A análise de apoio foi usada porque a IA principal não respondeu com a qualidade esperada; a leitura ficou mais conservadora e alinhada ao contexto do jogo.",
     source: "heuristic",
@@ -196,7 +208,7 @@ export async function generatePrediction(match: Match, previousPrediction?: Pred
 
   const prompt = `
 Você é um analista estatístico sênior de futebol e especialista em teoria dos jogos.
-Sua tarefa é analisar a partida entre ${match.homeTeam.name} e ${match.awayTeam.name} (${match.tournament} - ${match.group}) e gerar uma previsão realista com argumentos lógicos e frios.
+Sua tarefa é analisar a partida entre ${match.homeTeam.name} e ${match.awayTeam.name} (${match.tournament} - ${match.group}) e gerar uma previsão realista, específica e útil para um usuário que quer entender o jogo de forma objetiva.
 ${previousContext}
 Notícias recentes (foco em desfalques e escalações):
 ${match.homeTeam.name}:
@@ -205,12 +217,15 @@ ${homeNews}
 ${match.awayTeam.name}:
 ${awayNews}
 
-Regras:
-1. Baseie-se em notícias recentes, contexto de escalação, forma, histórico e matemática do grupo.
-2. Mantenha a previsão estável quando não houver sinais novos. Não troque o palpite por tendência de curto prazo sem evidência robusta.
-3. Se houver uma mudança relevante, escreva em motivo_alteracao uma frase curta explicando a razão principal.
-4. Não use termos clichês, exclamações ou emojis.
-5. Seja analítico, frio e coerente.
+Regras obrigatórias:
+1. Não gere respostas vagas como "jogo equilibrado" sem contexto.
+2. Cite uma lógica concreta: vantagem de casa, folha de escalação, estilo de jogo, pressão, transições, ou impacto de desfalques.
+3. Se houver pouca informação, seja específico sobre isso em vez de repetir frases genéricas.
+4. Mantenha a previsão estável quando não houver sinais novos.
+5. Não use termos clichês, exclamações ou emojis.
+6. Escreva em um tom profissional, mas claro.
+7. No campo motivo_alteracao, explique, se houver mudança, a razão principal de forma curta e objetiva.
+8. O conteúdo deve parecer útil para um usuário de aposta, mas sem ser exagerado.
 `;
 
   const responseSchema: Schema = {
