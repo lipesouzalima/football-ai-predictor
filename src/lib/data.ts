@@ -9,6 +9,24 @@ export type Match = {
   group?: string;
 };
 
+export const FIFA_RANKINGS: Record<string, number> = {
+  ARG: 1, ESP: 2, FRA: 3, ENG: 4, POR: 5, BRA: 6, MAR: 7, NED: 8, BEL: 9, GER: 10,
+  CRO: 11, ITA: 12, COL: 13, MEX: 14, SEN: 15, URU: 16, USA: 17, JPN: 18, SUI: 19, IRN: 20,
+  DEN: 20, AUT: 22, TUR: 22, ECU: 23, UKR: 24, KOR: 25, AUS: 27, SWE: 28, HUN: 29, CAN: 30,
+  WAL: 30, SRB: 32, CIV: 33, QAT: 35, EGY: 36, POL: 36, RUS: 37, NGA: 38, SCO: 39, SCOTLAND: 39,
+  TUN: 41, PER: 42, CHI: 43, PAN: 43, ALG: 44, SVK: 44, ROU: 45, CZE: 47, SAU: 61, PAR: 62,
+  UZB: 62, FIN: 63, GHA: 64, ALB: 66, CPV: 67, JOR: 68, UAE: 69, MKD: 70, ISL: 72, MNE: 73,
+  GEO: 74, NOR: 74, BIH: 75, OMA: 76, HON: 79, BHR: 80, BOL: 84, LUX: 85, HAI: 85, CUW: 86,
+  CHN: 88, NZL: 95, TTO: 100, THA: 101, VNM: 116, IND: 121, IDN: 134, TWN: 166
+};
+
+export function getFifaRanking(code: string): number | null {
+  if (!code) return null;
+  const normalized = code.trim().toUpperCase();
+  return FIFA_RANKINGS[normalized] || null;
+}
+
+
 // Copa do Mundo 2026 - Mocks baseados no horário local: 2026-06-23T18:43:43-03:00
 export const MOCK_MATCHES: Match[] = [
   // Anteriores

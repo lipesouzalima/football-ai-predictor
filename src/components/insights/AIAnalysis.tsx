@@ -114,25 +114,6 @@ export function AIAnalysis({
         </motion.div>
       ))}
 
-      {data.motivo_alteracao ? (
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: "spring", damping: 25, stiffness: 120, delay: 0.32 }}
-          className="rounded-[1.8rem] border border-amber-200/70 bg-amber-50/90 p-5 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.55)] backdrop-blur-xl"
-        >
-          <div className="flex items-start gap-4">
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-amber-100">
-              <Lightbulb className="h-5 w-5 text-amber-700" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <h4 className="font-heading text-base font-black tracking-[-0.02em] text-slate-950">Motivo da mudança</h4>
-              <p className="mt-2 text-sm font-semibold leading-relaxed text-slate-600">{data.motivo_alteracao}</p>
-            </div>
-          </div>
-        </motion.div>
-      ) : null}
-
       <motion.div
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
@@ -150,6 +131,25 @@ export function AIAnalysis({
           </div>
         </div>
       </motion.div>
+
+      {data.motivo_alteracao ? (
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: "spring", damping: 25, stiffness: 120, delay: 0.4 }}
+          className="rounded-[1.8rem] border border-amber-200/70 bg-amber-50/90 p-5 shadow-[0_18px_50px_-34px_rgba(15,23,42,0.55)] backdrop-blur-xl"
+        >
+          <div className="flex items-start gap-4">
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-amber-100">
+              <Lightbulb className="h-5 w-5 text-amber-700" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h4 className="font-heading text-base font-black tracking-[-0.02em] text-slate-950">Mudança de opinião</h4>
+              <p className="mt-2 text-sm font-semibold leading-relaxed text-slate-600">{data.motivo_alteracao}</p>
+            </div>
+          </div>
+        </motion.div>
+      ) : null}
     </div>
   );
 }

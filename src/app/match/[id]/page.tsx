@@ -1,6 +1,7 @@
-import { MOCK_MATCHES, Match } from "@/lib/data";
+import { MOCK_MATCHES, Match, getFifaRanking } from "@/lib/data";
 import { getPrediction } from "@/lib/ai";
 import { AIAnalysis } from "@/components/insights/AIAnalysis";
+import { RefreshButton } from "@/components/insights/RefreshButton";
 import { formatKickoffInBrazil, formatMatchDateInBrazil } from "@/lib/date-utils";
 import { Clock3, Sparkles } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -18,6 +19,7 @@ async function getMatch(id: string): Promise<Match | undefined> {
 }
 
 function TeamHero({ team }: { team: Match["homeTeam"] }) {
+  const ranking = getFifaRanking(team.code);
   return (
     <div className="flex flex-col items-center text-center">
       <div className="grid h-24 w-24 place-items-center overflow-hidden rounded-full bg-white/32 shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_18px_52px_-24px_rgba(15,23,42,0.72)] ring-1 ring-white/46 sm:h-32 sm:w-32">
@@ -33,21 +35,29 @@ function TeamHero({ team }: { team: Match["homeTeam"] }) {
       <span className="mt-2 max-w-[9rem] text-sm font-black text-white/72 sm:max-w-[12rem]">
         {team.name}
       </span>
+      {ranking && (
+        <span className="mt-1 rounded-full bg-white/14 px-2 py-0.5 text-[0.68rem] font-bold tracking-wide text-white/80 ring-1 ring-white/10 sm:text-xs">
+          Ranking FIFA: #{ranking}
+        </span>
+      )}
     </div>
   );
 }
 
 export default async function MatchPage(props: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const params = await props.params;
+  const searchParams = await props.searchParams;
+  const forceRefresh = searchParams.refresh === "true";
   const match = await getMatch(params.id);
 
   if (!match) {
     notFound();
   }
 
-  const prediction = await getPrediction(match);
+  const prediction = await getPrediction(match, forceRefresh);
   const homeColor = match.homeTeam.color || "#2563eb";
   const awayColor = match.awayTeam.color || "#f97316";
   const hasScore = match.status === "FINISHED" || match.status === "IN_PLAY";
@@ -114,6 +124,7 @@ export default async function MatchPage(props: {
                 Leitura do jogo
               </h2>
             </div>
+            <RefreshButton />
           </div>
           <AIAnalysis data={prediction} homeColor={homeColor} awayColor={awayColor} />
         </section>
@@ -121,3 +132,4 @@ export default async function MatchPage(props: {
     </main>
   );
 }
+

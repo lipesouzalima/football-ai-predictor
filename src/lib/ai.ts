@@ -1,6 +1,6 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { PredictionData } from "@/lib/prediction-types";
-import { Match } from "./data";
+import { Match, getFifaRanking } from "./data";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -69,18 +69,26 @@ type CachedPrediction = {
   data: PredictionData;
 };
 
+function hasMeaningfulKeyPlayer(data: PredictionData | undefined | null): boolean {
+  if (!data?.jogador_chave) return false;
+  const name = data.jogador_chave.nome?.trim() || "";
+  const insight = data.jogador_chave.insight?.trim() || "";
+  return name.length > 2 && insight.length > 12;
+}
+
 function isUsablePrediction(data: PredictionData | undefined | null): data is PredictionData {
   if (!data) return false;
   if (data.source && data.source !== "ai") return false;
-  return Boolean(
+  const hasScores = Boolean(
     data.previsao &&
     Number.isFinite(data.previsao.gols_time_casa) &&
     Number.isFinite(data.previsao.gols_time_fora) &&
     Number.isFinite(data.previsao.confianca_percentual)
   );
+  return hasScores && hasMeaningfulKeyPlayer(data);
 }
 
-function readPredictionCache(matchId: string): PredictionData | null {
+function readPredictionCache(matchId: string, status?: Match["status"]): PredictionData | null {
   try {
     if (!fs.existsSync(PREDICTION_CACHE_FILE)) return null;
     const raw = fs.readFileSync(PREDICTION_CACHE_FILE, "utf-8");
@@ -93,7 +101,10 @@ function readPredictionCache(matchId: string): PredictionData | null {
 
     const entry = validEntries.find((item) => item.matchId === matchId);
     if (!entry) return null;
-    if (Date.now() - entry.timestamp > PREDICTION_CACHE_TTL_MS) return null;
+
+    const isMatchFinished = status === "FINISHED";
+    const ttl = isMatchFinished ? 30 * 24 * 60 * 60 * 1000 : 10 * 60 * 1000; // 30 days for finished matches, 10 mins for in_play/timed
+    if (Date.now() - entry.timestamp > ttl) return null;
     return entry.data;
   } catch {
     return null;
@@ -121,44 +132,131 @@ function writePredictionCache(matchId: string, data: PredictionData) {
   }
 }
 
-function buildHeuristicPrediction(match: Match): PredictionData {
+function isGenericInsight(text: string | null | undefined): boolean {
+  if (!text) return true;
+  const normalized = text.toLowerCase().trim();
+  if (normalized.length < 10) return true;
+  const placeholderPhrases = [
+    "não há informações específicas",
+    "sem dados disponíveis",
+    "placeholder",
+  ];
+  return placeholderPhrases.some((phrase) => normalized.includes(phrase));
+}
+
+
+function clampPredictionValue(value: number, min: number, max: number) {
+  if (!Number.isFinite(value)) return min;
+  return Math.max(min, Math.min(max, Math.round(value)));
+}
+
+function selectKeyPlayer(match: Match): { name: string; insight: string } {
+  const homeName = (match.homeTeam.name || "").toLowerCase();
+  const awayName = (match.awayTeam.name || "").toLowerCase();
+
+  const playerMap: Record<string, { name: string; insight: string }> = {
+    brasil: { name: "Vinícius Júnior", insight: "Ele tende a decidir o jogo porque cria superioridade em velocidade e costuma ser o nome mais perigoso quando a equipe precisa abrir o bloco adversário." },
+    argentina: { name: "Lionel Messi", insight: "Ele costuma ser o jogador-chave porque transforma a pressão em oportunidade e consegue desequilibrar em poucos segundos." },
+    frança: { name: "Kylian Mbappé", insight: "Ele tende a decidir o jogo por ter a combinação ideal de velocidade, finalização e capacidade de mudar o fluxo da partida." },
+    espanha: { name: "Lamine Yamal", insight: "Ele pode decidir o jogo por causar desequilíbrio em faixa e abrir espaços em fases de ataque rápido." },
+    alemanha: { name: "Florian Wirtz", insight: "Ele costuma ser o nome mais influente porque une criação, condução e presença em zonas decisivas." },
+    inglaterra: { name: "Jude Bellingham", insight: "Ele tende a decidir por ser o elo entre o meio-campo e a frente, com presença em todas as fases do jogo." },
+    portugal: { name: "Cristiano Ronaldo", insight: "Ele costuma ser o jogador-chave porque transforma momentos isolados em chances reais e altera a pressão defensiva do adversário." },
+    itália: { name: "Federico Chiesa", insight: "Ele pode decidir o jogo por sua capacidade de desequilibrar em velocidade e provocar erros na defesa." },
+    holanda: { name: "Cody Gakpo", insight: "Ele tende a ser o nome mais decisivo por unir movimentação, finalização e presença na área." },
+    uruguai: { name: "Federico Valverde", insight: "Ele costuma decidir o jogo por sua intensidade e por ser o elo entre a proteção defensiva e a criação ofensiva." },
+    méxico: { name: "Raúl Jiménez", insight: "Ele pode ser o jogador-chave por sua presença na área e pela capacidade de finalizar em momentos curtos." },
+    japão: { name: "Takefusa Kubo", insight: "Ele tende a decidir por ser o principal criador e por abrir espaços com qualidade de passe e drible." },
+    coreia: { name: "Son Heung-min", insight: "Ele costuma ser o nome mais impactante por sua capacidade de finalizar e mudar o jogo em poucas ações." },
+    marrocos: { name: "Hakim Ziyech", insight: "Ele pode decidir o jogo por sua habilidade de criar, driblar e encontrar o último passe." },
+    senegal: { name: "Sadio Mané", insight: "Ele tende a ser decisivo porque muda o jogo com velocidade, finalização e presença em transições." },
+    colômbia: { name: "Luis Díaz", insight: "Ele costuma decidir em fases de ataque rápido porque gera perigo em cada corrida e cada aproximação da área." },
+    ecuador: { name: "Enner Valencia", insight: "Ele tende a ser o nome mais importante por sua presença na área e por transformar oportunidades em gols." },
+  };
+
+  for (const [teamKey, player] of Object.entries(playerMap)) {
+    if (homeName.includes(teamKey) || awayName.includes(teamKey)) {
+      return player;
+    }
+  }
+
+  return {
+    name: `${match.homeTeam.name} x ${match.awayTeam.name}`,
+    insight: "O jogador-chave tende a ser o nome que conseguir ganhar a segunda bola e criar a jogada mais perigosa em zonas decisivas.",
+  };
+}
+
+function buildDeterministicPrediction(match: Match, previousPrediction?: PredictionData): PredictionData {
   const homeCode = (match.homeTeam.code || match.homeTeam.name).toLowerCase();
   const awayCode = (match.awayTeam.code || match.awayTeam.name).toLowerCase();
   const homeTier = TEAM_TIER[homeCode] || 4;
   const awayTier = TEAM_TIER[awayCode] || 4;
-  const edge = homeTier - awayTier + 1;
+  const tierGap = homeTier - awayTier;
+  const keyPlayer = selectKeyPlayer(match);
 
   let homeGoals = 1;
   let awayGoals = 1;
   let confidence = 66;
-  let reason = `A leitura de apoio aponta um confronto equilibrado entre ${match.homeTeam.name} e ${match.awayTeam.name}, com leve vantagem para o mandante quando o contexto tático pesa mais que o nome isolado.`;
+  let analysis = `O duelo parece fechado e deve se decidir por detalhes. ${match.homeTeam.name} tem mais chance de ditar o ritmo por jogar em casa, mas ${match.awayTeam.name} pode virar o jogo em transições curtas.`;
+  let impact = `Sem um boletim completo, a leitura base é prudente: qualquer desfalque em posições-chave tende a pesar mais na equipe que depende mais de organização em campo.`;
+  let market = `A linha mais coerente é um jogo de equilíbrio com o mandante levando mais volume de jogo e o visitante dependendo de uma passagem de qualidade para abrir o placar.`;
+  let keyPlayerName = keyPlayer.name;
+  let keyPlayerInsight = keyPlayer.insight;
+  let alteration = "";
 
-  if (edge >= 3) {
+  if (tierGap >= 2) {
     homeGoals = 2;
     awayGoals = 0;
-    confidence = 74;
-    reason = `${match.homeTeam.name} entra como favorito claro no papel, com superioridade de elenco e vantagem de atuar em casa.`;
-  } else if (edge >= 2) {
+    confidence = 78;
+    analysis = `${match.homeTeam.name} entra como favorito claro porque tem melhor encaixe de elenco e vantagem de atuar em casa. O jogo deve ficar mais controlado pelo mandante, com o rival dependendo de transições para incomodar.`;
+    impact = `Qualquer desfalque defensivo ou no meio-campo pesa mais em ${match.homeTeam.name}, porque a equipe precisa manter a posse e a pressão para controlar o jogo.`;
+    market = `O mercado tende a valorizar o mandante como favorito, mas o cenário mais seguro é esperar um jogo com domínio do local e menos espaço para o visitante.`;
+    keyPlayerName = keyPlayer.name;
+    keyPlayerInsight = keyPlayer.insight;
+  } else if (tierGap >= 1) {
     homeGoals = 2;
     awayGoals = 1;
     confidence = 72;
-    reason = `${match.homeTeam.name} tem vantagem suficiente para controlar o jogo, mas o duelo ainda deve ficar aberto pela qualidade do rival.`;
-  } else if (edge >= 1) {
-    homeGoals = 2;
-    awayGoals = 1;
-    confidence = 68;
-    reason = `O jogo deve ficar em um cenário de equilíbrio com pequena vantagem do mandante, especialmente pela casa e pela dinâmica de ataque.`;
-  } else if (edge <= -2) {
+    analysis = `${match.homeTeam.name} tem pequena vantagem por jogar em casa e por entrar com melhor contexto de elenco. ${match.awayTeam.name} pode incomodar, mas deve depender de momentos de transição.`;
+    impact = `Se houver desfalques no setor criativo ou defensivo, a equipe da casa tende a sentir mais o peso porque precisa controlar o ritmo do jogo.`;
+    market = `A leitura mais consistente é um confronto com domínio do mandante, mas com espaço para o visitante conseguir um gol em contraataque.`;
+    keyPlayerName = keyPlayer.name;
+    keyPlayerInsight = keyPlayer.insight;
+  } else if (tierGap <= -2) {
     homeGoals = 0;
     awayGoals = 2;
-    confidence = 70;
-    reason = `${match.awayTeam.name} chega com melhor leitura de jogo e pode explorar a pressão do mandante em fases de transição.`;
+    confidence = 74;
+    analysis = `${match.awayTeam.name} chega com melhor leitura de jogo e pode explorar a pressão do mandante em transições. O duelo deve ficar mais aberto para o visitante do que para o time de casa.`;
+    impact = `Se houver ausência de peças importantes no setor defensivo do mandante, o visitante ganha mais espaço para atacar com velocidade e objetividade.`;
+    market = `A linha mais plausível é um jogo mais favorável ao visitante, sobretudo se o mandante não conseguir sustentar a posse de bola.`;
+    keyPlayerName = keyPlayer.name;
+    keyPlayerInsight = keyPlayer.insight;
   } else {
     homeGoals = 1;
     awayGoals = 1;
     confidence = 64;
-    reason = `O duelo parece muito parelho e tende a se decidir por detalhes, com pouca margem para grandes diferenças de resultado.`;
+    analysis = `O duelo parece muito fechado e deve se decidir por detalhes. ${match.homeTeam.name} e ${match.awayTeam.name} têm condições parecidas, então a diferença tende a vir de um erro, de uma bola parada ou de um momento decisivo.`;
+    impact = `Qualquer desfalque em posições-chave pode mudar o equilíbrio do jogo, porque as equipes parecem próximas in nível e em forma.`;
+    market = `O cenário mais racional é de jogo equilibrado, com pouca margem para grandes diferenças e bastante valor em detalhes.`;
+    keyPlayerName = keyPlayer.name;
+    keyPlayerInsight = keyPlayer.insight;
   }
+
+  if (previousPrediction?.previsao) {
+    const prevHome = previousPrediction.previsao.gols_time_casa;
+    const prevAway = previousPrediction.previsao.gols_time_fora;
+    if (Number.isFinite(prevHome) && Number.isFinite(prevAway)) {
+      const delta = Math.abs(homeGoals - prevHome) + Math.abs(awayGoals - prevAway);
+      if (delta <= 1) {
+        homeGoals = prevHome;
+        awayGoals = prevAway;
+        alteration = "";
+      } else {
+        alteration = `A previsão de gols foi alterada de ${prevHome}x${prevAway} para ${homeGoals}x${awayGoals} com base no ajuste técnico recente das equipes.`;
+      }
+    }
+  }
+
 
   return {
     previsao: {
@@ -166,66 +264,89 @@ function buildHeuristicPrediction(match: Match): PredictionData {
       gols_time_fora: awayGoals,
       confianca_percentual: confidence,
     },
-    analise_matematica_grupo: reason,
-    impacto_desfalques: `Sem um boletim oficial completo, a leitura base assume que a escalação principal permanece próxima do esperado e que o contexto tático pesa mais do que o nome isolado.`,
-    consenso_mercado: `O cenário mais provável é um jogo equilibrado, com pequena vantagem do mandante quando os detalhes de escalação não mudam o contexto do duelo.`,
+    analise_matematica_grupo: analysis,
+    impacto_desfalques: impact,
+    consenso_mercado: market,
     jogador_chave: {
-      nome: match.homeTeam.name,
-      insight: `O nome mais provável para decidir a partida é o jogador principal da equipe da casa, especialmente em um jogo em que a organização ofensiva pode definir a diferença.`,
+      nome: keyPlayerName,
+      insight: keyPlayerInsight,
     },
-    motivo_alteracao: "A análise de apoio foi usada porque a IA principal não respondeu com a qualidade esperada; a leitura ficou mais conservadora e alinhada ao contexto do jogo.",
+    motivo_alteracao: alteration,
     source: "heuristic",
   };
 }
 
-async function fetchNews(query: string) {
-  if (!process.env.NEWSAPI_KEY) return "Nenhuma notícia recente.";
-  try {
-    const res = await fetch(`https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=pt&sortBy=publishedAt&pageSize=3`, {
-      headers: {
-        "X-Api-Key": process.env.NEWSAPI_KEY,
-      },
-      next: { revalidate: 3600 },
-    });
-    const data = await res.json();
-    if (data.articles && data.articles.length > 0) {
-      return data.articles.map((a: any) => `- ${a.title}: ${a.description}`).join("\n");
-    }
-    return "Nenhuma notícia recente.";
-  } catch (error) {
-    console.error("NewsAPI Error:", error);
-    return "Erro ao buscar notícias.";
-  }
+function normalizeAiPrediction(parsed: Partial<PredictionData> | null | undefined, fallback: PredictionData): PredictionData {
+  const safePrevisao = parsed?.previsao;
+  const homeGoals = safePrevisao && Number.isFinite(safePrevisao.gols_time_casa)
+    ? clampPredictionValue(safePrevisao.gols_time_casa, 0, 5)
+    : fallback.previsao.gols_time_casa;
+  const awayGoals = safePrevisao && Number.isFinite(safePrevisao.gols_time_fora)
+    ? clampPredictionValue(safePrevisao.gols_time_fora, 0, 5)
+    : fallback.previsao.gols_time_fora;
+  const confidence = safePrevisao && Number.isFinite(safePrevisao.confianca_percentual)
+    ? clampPredictionValue(safePrevisao.confianca_percentual, 0, 100)
+    : fallback.previsao.confianca_percentual;
+
+  const analysis = parsed?.analise_matematica_grupo?.trim();
+  const impact = parsed?.impacto_desfalques?.trim();
+  const market = parsed?.consenso_mercado?.trim();
+  const keyName = parsed?.jogador_chave?.nome?.trim();
+  const keyInsight = parsed?.jogador_chave?.insight?.trim();
+
+  const resolvedKeyName = (keyName && keyName.length > 2) ? keyName : fallback.jogador_chave.nome;
+  const resolvedKeyInsight = (keyInsight && keyInsight.length > 12 && !isGenericInsight(keyInsight)) ? keyInsight : fallback.jogador_chave.insight;
+
+  return {
+    previsao: { gols_time_casa: homeGoals, gols_time_fora: awayGoals, confianca_percentual: confidence },
+    analise_matematica_grupo: analysis && !isGenericInsight(analysis) ? analysis : fallback.analise_matematica_grupo,
+    impacto_desfalques: impact && !isGenericInsight(impact) ? impact : fallback.impacto_desfalques,
+    consenso_mercado: market && !isGenericInsight(market) ? market : fallback.consenso_mercado,
+    jogador_chave: {
+      nome: resolvedKeyName,
+      insight: resolvedKeyInsight,
+    },
+    motivo_alteracao: parsed?.motivo_alteracao?.trim() || fallback.motivo_alteracao || "",
+    source: "ai",
+  };
 }
 
 export async function generatePrediction(match: Match, previousPrediction?: PredictionData): Promise<PredictionData> {
-  const homeNews = await fetchNews(`${match.homeTeam.name} seleção futebol desfalque OR lesão OR escalação`);
-  const awayNews = await fetchNews(`${match.awayTeam.name} seleção futebol desfalque OR lesão OR escalação`);
+  const fallbackPrediction = buildDeterministicPrediction(match, previousPrediction);
+
+  if (!process.env.GEMINI_API_KEY) {
+    return fallbackPrediction;
+  }
 
   const previousContext = previousPrediction
-    ? `\nPrevisão anterior guardada: ${JSON.stringify(previousPrediction)}\nUse essa como base e só mude se houver um sinal novo e claro. Se mudar, explique o motivo em motivo_alteracao.\n`
+    ? `\nPrevisão anterior guardada: ${JSON.stringify(previousPrediction)}\nUse essa como base e só mude se houver um sinal novo e claro. Se mudar, explique a mudança de forma curta e objetiva no campo motivo_alteracao.\n`
     : "";
+
+  const homeRank = getFifaRanking(match.homeTeam.code) || "sem ranking";
+  const awayRank = getFifaRanking(match.awayTeam.code) || "sem ranking";
 
   const prompt = `
 Você é um analista estatístico sênior de futebol e especialista em teoria dos jogos.
-Sua tarefa é analisar a partida entre ${match.homeTeam.name} e ${match.awayTeam.name} (${match.tournament} - ${match.group}) e gerar uma previsão realista, específica e útil para um usuário que quer entender o jogo de forma objetiva.
+Sua tarefa é analisar a partida entre ${match.homeTeam.name} e ${match.awayTeam.name} (${match.tournament} - ${match.group}) e gerar uma previsão útil e altamente assertiva para o usuário.
+
+Use a ferramenta Google Search para pesquisar notícias recentes, desfalques, escalações prováveis, clima técnico e odds do mercado sobre a partida de hoje ou próxima entre ${match.homeTeam.name} e ${match.awayTeam.name}.
+
+Contexto da partida:
+- Mandante: ${match.homeTeam.name} (Código FIFA: ${match.homeTeam.code}, Ranking FIFA: #${homeRank})
+- Visitante: ${match.awayTeam.name} (Código FIFA: ${match.awayTeam.code}, Ranking FIFA: #${awayRank})
+- Competição: ${match.tournament}
+- Grupo: ${match.group || "sem grupo"}
 ${previousContext}
-Notícias recentes (foco em desfalques e escalações):
-${match.homeTeam.name}:
-${homeNews}
 
-${match.awayTeam.name}:
-${awayNews}
-
-Regras obrigatórias:
-1. Não gere respostas vagas como "jogo equilibrado" sem contexto.
-2. Cite uma lógica concreta: vantagem de casa, folha de escalação, estilo de jogo, pressão, transições, ou impacto de desfalques.
-3. Se houver pouca informação, seja específico sobre isso em vez de repetir frases genéricas.
-4. Mantenha a previsão estável quando não houver sinais novos.
-5. Não use termos clichês, exclamações ou emojis.
-6. Escreva em um tom profissional, mas claro.
-7. No campo motivo_alteracao, explique, se houver mudança, a razão principal de forma curta e objetiva.
-8. O conteúdo deve parecer útil para um usuário de aposta, mas sem ser exagerado.
+Regras obrigatórias para os insights:
+1. Faça pesquisas no Google Search para obter dados reais e atualizados do jogo (desfalques de última hora, escalações prováveis, importância da partida).
+2. Não escreva frases vagas, genéricas ou clichês vazios. Descreva o cenário tático de forma rica.
+3. No campo 'analise_matematica_grupo', forneça um insight sobre "Tática e grupo", detalhando o encaixe tático, relevância da partida no grupo e pontos fortes/fracos. Mencione os Rankings da FIFA se relevante.
+4. No campo 'impacto_desfalques', liste os principais desfalques reais pesquisados e explique o impacto tático deles em campo. Se não houver desfalques confirmados após pesquisar, informe isso especificamente (ex: "Sem desfalques importantes confirmados para a partida.").
+5. No campo 'consenso_mercado', traga a leitura de mercado (ex: odds de vitória, handicap, expectativas de gols) com base nas casas de apostas ou análise estatística de mercado real pesquisada.
+6. No campo 'jogador_chave', traga o nome de um jogador de grande destaque para a partida (pesquise quem está jogando e em boa fase) e um insight concreto no campo 'insight' detalhando por que ele decidirá o jogo.
+7. No campo 'motivo_alteracao', explique a mudança de opinião em relação à previsão anterior SE (e somente se) você estiver mudando os placares ou alterando substancialmente a análise anterior. Caso contrário, ou se for a primeira previsão, deixe este campo vazio/em branco ("") ou null.
+8. Escreva toda a resposta em português brasileiro, mantendo uma linguagem profissional, objetiva e analítica.
 `;
 
   const responseSchema: Schema = {
@@ -267,18 +388,37 @@ Regras obrigatórias:
           responseMimeType: "application/json",
           responseSchema,
           temperature: 0.2,
+          tools: [{ googleSearch: {} }],
         },
       });
 
       const text = response.text;
       if (!text) throw new Error("Empty response from Gemini");
 
-      const parsed = JSON.parse(text) as PredictionData;
-      return {
-        ...parsed,
-        motivo_alteracao: parsed.motivo_alteracao?.trim() || "Previsão mantida sem sinais novos o suficiente para alterar o palpite.",
-        source: "ai",
-      };
+      const parsed = JSON.parse(text) as Partial<PredictionData>;
+      const normalizedPrediction = normalizeAiPrediction(parsed, fallbackPrediction);
+
+      // Limpeza do motivo_alteracao de acordo com mudança real de opinião
+      if (previousPrediction?.previsao) {
+        const prevHome = previousPrediction.previsao.gols_time_casa;
+        const prevAway = previousPrediction.previsao.gols_time_fora;
+        const currHome = normalizedPrediction.previsao.gols_time_casa;
+        const currAway = normalizedPrediction.previsao.gols_time_fora;
+        if (currHome === prevHome && currAway === prevAway) {
+          normalizedPrediction.motivo_alteracao = "";
+        } else if (!normalizedPrediction.motivo_alteracao) {
+          normalizedPrediction.motivo_alteracao = `Previsão de placar alterada de ${prevHome}x${prevAway} para ${currHome}x${currAway}.`;
+        }
+      } else {
+        normalizedPrediction.motivo_alteracao = "";
+      }
+
+      if (normalizedPrediction.analise_matematica_grupo === fallbackPrediction.analise_matematica_grupo &&
+          normalizedPrediction.impacto_desfalques === fallbackPrediction.impacto_desfalques &&
+          normalizedPrediction.consenso_mercado === fallbackPrediction.consenso_mercado) {
+        return fallbackPrediction;
+      }
+      return normalizedPrediction;
     } catch (error) {
       lastError = error;
       console.warn(`Gemini model ${modelName} failed, trying fallback.`, error);
@@ -286,21 +426,22 @@ Regras obrigatórias:
   }
 
   console.error("Gemini Generation Error:", lastError);
-  return buildHeuristicPrediction(match);
+  return fallbackPrediction;
 }
 
 export async function getPrediction(match: Match, forceRefresh = false): Promise<PredictionData> {
   if (!forceRefresh) {
-    const cached = readPredictionCache(match.id);
+    const cached = readPredictionCache(match.id, match.status);
     if (cached) {
       return cached;
     }
   }
 
-  const previousPrediction = forceRefresh ? undefined : readPredictionCache(match.id) ?? undefined;
+  const previousPrediction = forceRefresh ? undefined : readPredictionCache(match.id, match.status) ?? undefined;
   const prediction = await generatePrediction(match, previousPrediction);
   if (prediction.source === "ai") {
     writePredictionCache(match.id, prediction);
   }
   return prediction;
 }
+
