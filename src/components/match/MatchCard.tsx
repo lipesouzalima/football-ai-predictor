@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Match } from "@/lib/data";
-import { formatMatchDateInBrazil } from "@/lib/date-utils";
+import { formatKickoffInBrazil, formatMatchDateInBrazil } from "@/lib/date-utils";
 import { Sparkles } from "lucide-react";
 import { Countdown } from "./Countdown";
 import { TeamFlagImage } from "./TeamFlagImage";
@@ -109,8 +109,8 @@ export function MatchCard({ match }: { match: Match }) {
                 <span className="mt-5 rounded-full bg-slate-950/18 px-3 py-1 text-xs font-black uppercase tracking-wide text-white/88 ring-1 ring-white/12">
                   {formatMatchDateInBrazil(match.date)}
                 </span>
-                <span className="mt-2 text-[0.66rem] font-black uppercase tracking-[0.16em] text-white/62">
-                  Horário BR
+                <span className="mt-2 font-heading text-2xl font-black leading-none tracking-tight text-white drop-shadow-sm">
+                  {formatKickoffInBrazil(match.date)}
                 </span>
               </div>
 

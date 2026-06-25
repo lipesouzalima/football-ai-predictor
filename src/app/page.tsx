@@ -52,12 +52,14 @@ export default async function Home() {
             </div>
             <div className="relative z-10 flex items-start justify-between gap-5">
               <div>
-                <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-slate-600 shadow-sm ring-1 ring-white/70">
-                  <RadioTower className="h-3.5 w-3.5 text-fuchsia-500" />
+                <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-fuchsia-500/90 via-violet-500/90 to-cyan-500/90 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-white shadow-lg shadow-fuchsia-500/20 ring-1 ring-white/40">
+                  <RadioTower className="h-3.5 w-3.5" />
                   IA · Copa 2026
                 </span>
                 <h1 className="mt-5 max-w-xl font-heading text-5xl font-black leading-[0.92] tracking-[-0.07em] text-slate-950 text-balance sm:text-7xl">
-                  IA Fut Predictor
+                  <span className="bg-gradient-to-r from-slate-950 via-violet-700 to-cyan-600 bg-clip-text text-transparent">
+                    IA Fut Predictor
+                  </span>
                 </h1>
                 <p className="mt-4 max-w-lg text-base font-bold leading-relaxed text-slate-600 sm:text-lg">
                   Um app feito pra te ajudar a apostar certeiro com ajuda da IA - criado por Felipe Lima.
