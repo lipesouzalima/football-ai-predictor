@@ -264,6 +264,7 @@ function buildDeterministicPrediction(match: Match, previousPrediction?: Predict
       gols_time_fora: awayGoals,
       confianca_percentual: confidence,
     },
+    historico_confrontos: `Com base nas posições de ranking e relevância, o histórico aponta para um duelo equilibrado onde a eficiência ofensiva tem sido o diferencial nos últimos confrontos.`,
     analise_matematica_grupo: analysis,
     impacto_desfalques: impact,
     consenso_mercado: market,
@@ -289,6 +290,7 @@ function normalizeAiPrediction(parsed: Partial<PredictionData> | null | undefine
     : fallback.previsao.confianca_percentual;
 
   const analysis = parsed?.analise_matematica_grupo?.trim();
+  const history = parsed?.historico_confrontos?.trim();
   const impact = parsed?.impacto_desfalques?.trim();
   const market = parsed?.consenso_mercado?.trim();
   const keyName = parsed?.jogador_chave?.nome?.trim();
@@ -299,6 +301,7 @@ function normalizeAiPrediction(parsed: Partial<PredictionData> | null | undefine
 
   return {
     previsao: { gols_time_casa: homeGoals, gols_time_fora: awayGoals, confianca_percentual: confidence },
+    historico_confrontos: history && !isGenericInsight(history) ? history : fallback.historico_confrontos,
     analise_matematica_grupo: analysis && !isGenericInsight(analysis) ? analysis : fallback.analise_matematica_grupo,
     impacto_desfalques: impact && !isGenericInsight(impact) ? impact : fallback.impacto_desfalques,
     consenso_mercado: market && !isGenericInsight(market) ? market : fallback.consenso_mercado,
@@ -325,33 +328,38 @@ export async function generatePrediction(match: Match, previousPrediction?: Pred
   const homeRank = getFifaRanking(match.homeTeam.code) || "sem ranking";
   const awayRank = getFifaRanking(match.awayTeam.code) || "sem ranking";
 
-  const prompt = `
+const prompt = `
 Você é um analista estatístico sênior de futebol e especialista em teoria dos jogos.
 Sua tarefa é analisar a partida entre ${match.homeTeam.name} e ${match.awayTeam.name} (${match.tournament} - ${match.group}) e gerar uma previsão útil e altamente assertiva para o usuário.
 
-Use a ferramenta Google Search para pesquisar notícias recentes, desfalques, escalações prováveis, clima técnico e odds do mercado sobre a partida de hoje ou próxima entre ${match.homeTeam.name} e ${match.awayTeam.name}.
+Use a ferramenta Google Search OBRIGATORIAMENTE para pesquisar na internet sobre a partida. Pesquise: histórico de confrontos diretos recentes (últimas 3-5 partidas), desfalques, lesões, cartões, escalações prováveis, clima técnico tático atual, e o consenso do mercado de apostas/analistas (odds, favoritos).
 
 Contexto da partida:
 - Mandante: ${match.homeTeam.name} (Código FIFA: ${match.homeTeam.code}, Ranking FIFA: #${homeRank})
 - Visitante: ${match.awayTeam.name} (Código FIFA: ${match.awayTeam.code}, Ranking FIFA: #${awayRank})
 - Competição: ${match.tournament}
-- Grupo: ${match.group || "sem grupo"}
+- Fase/Grupo: ${match.group || "sem grupo"}
 ${previousContext}
 
-Regras obrigatórias para os insights:
-1. Faça pesquisas no Google Search para obter dados reais e atualizados do jogo (desfalques de última hora, escalações prováveis, importância da partida).
-2. Não escreva frases vagas, genéricas ou clichês vazios. Descreva o cenário tático de forma rica.
-3. No campo 'analise_matematica_grupo', forneça um insight sobre "Tática e grupo", detalhando o encaixe tático, relevância da partida no grupo e pontos fortes/fracos. Mencione os Rankings da FIFA se relevante.
-4. No campo 'impacto_desfalques', liste os principais desfalques reais pesquisados e explique o impacto tático deles em campo. Se não houver desfalques confirmados após pesquisar, informe isso especificamente (ex: "Sem desfalques importantes confirmados para a partida.").
-5. No campo 'consenso_mercado', traga a leitura de mercado (ex: odds de vitória, handicap, expectativas de gols) com base nas casas de apostas ou análise estatística de mercado real pesquisada.
-6. No campo 'jogador_chave', traga o nome de um jogador de grande destaque para a partida (pesquise quem está jogando e em boa fase) e um insight concreto no campo 'insight' detalhando por que ele decidirá o jogo.
-7. No campo 'motivo_alteracao', explique a mudança de opinião em relação à previsão anterior SE (e somente se) você estiver mudando os placares ou alterando substancialmente a análise anterior. Caso contrário, ou se for a primeira previsão, deixe este campo vazio/em branco ("") ou null.
-8. Escreva toda a resposta em português brasileiro, mantendo uma linguagem profissional, objetiva e analítica.
+Regras obrigatórias:
+1. "Chain of Thought": Antes de preencher os insights finais, use os campos "pesquisa_*" para anotar o resultado das suas buscas na internet. Isso é seu rascunho de análise.
+2. Não escreva frases vagas ou genéricas nos insights finais.
+3. No campo 'historico_confrontos', resuma os últimos 3 a 5 confrontos diretos recentes que você pesquisou e como isso afeta a curva de desempenho e a confiança das equipes hoje.
+4. No campo 'analise_matematica_grupo', detalhe o encaixe tático, pontos fortes/fracos atuais.
+5. No campo 'impacto_desfalques', liste quem está fora (lesão/cartão) e como isso muda o time. Se não houver, informe que os times estão com força máxima.
+6. No campo 'consenso_mercado', mostre as previsões e odds de vitória/empate/derrota de casas de apostas ou analistas esportivos.
+7. No campo 'jogador_chave', aponte um jogador em boa fase (com nome) e por que ele decidirá o jogo.
+8. Gere placares baseados na sua pesquisa, não restrinja a 1x1 ou 0x0. Se um time estiver voando, pode dar 3x0, 4x1. Use todo seu potencial preditivo.
+9. Responda apenas em português brasileiro, mantendo postura sênior.
 `;
 
   const responseSchema: Schema = {
     type: Type.OBJECT,
     properties: {
+      pesquisa_historico: { type: Type.STRING, description: "Rascunho invisível sobre os últimos confrontos pesquisados." },
+      pesquisa_desfalques: { type: Type.STRING, description: "Rascunho invisível sobre lesões e cartões." },
+      pesquisa_taticas: { type: Type.STRING, description: "Rascunho invisível sobre o estado tático atual." },
+      pesquisa_mercado: { type: Type.STRING, description: "Rascunho invisível sobre mercado de apostas." },
       previsao: {
         type: Type.OBJECT,
         properties: {
@@ -361,6 +369,7 @@ Regras obrigatórias para os insights:
         },
         required: ["gols_time_casa", "gols_time_fora", "confianca_percentual"],
       },
+      historico_confrontos: { type: Type.STRING },
       analise_matematica_grupo: { type: Type.STRING },
       impacto_desfalques: { type: Type.STRING },
       consenso_mercado: { type: Type.STRING },
@@ -374,7 +383,7 @@ Regras obrigatórias para os insights:
       },
       motivo_alteracao: { type: Type.STRING },
     },
-    required: ["previsao", "analise_matematica_grupo", "impacto_desfalques", "consenso_mercado", "jogador_chave"],
+    required: ["pesquisa_historico", "pesquisa_desfalques", "pesquisa_taticas", "pesquisa_mercado", "previsao", "historico_confrontos", "analise_matematica_grupo", "impacto_desfalques", "consenso_mercado", "jogador_chave"],
   };
 
   let lastError: unknown;

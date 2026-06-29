@@ -300,7 +300,6 @@ Timezone obrigatório: ${BRAZIL_TIME_ZONE} (BRT, UTC-03:00).
 
 Retorne SOMENTE JSON válido, sem markdown, com esta forma:
 {
-  "phase": "Fase de Grupos",
   "matches": [
     {
       "homeTeamName": "Curaçao",
@@ -312,7 +311,7 @@ Retorne SOMENTE JSON válido, sem markdown, com esta forma:
       "homeGoals": null,
       "awayGoals": null,
       "tournament": "Copa do Mundo 2026",
-      "group": "Grupo E",
+      "group": "Fase de Grupos",
       "venue": "Philadelphia Stadium"
     }
   ]
@@ -320,6 +319,7 @@ Retorne SOMENTE JSON válido, sem markdown, com esta forma:
 
 Regras críticas:
 - Traga todos os jogos de ontem, hoje e dos próximos 3 dias considerando a data no Brasil.
+- Inclua jogos de TODAS as fases: Fase de Grupos, 16 avos de final (Round of 32), Oitavas de final, Quartas, Semifinal e Final. Especifique a fase no campo "group".
 - Converta todos os horários para ${BRAZIL_TIME_ZONE}; nunca use horário local dos EUA/México/Canadá sem converter.
 - Use códigos FIFA de três letras. Para Curaçao use CUW; Côte d'Ivoire use CIV; Türkiye use TUR; South Africa use RSA; Cabo Verde use CPV.
 - Se não tiver placar final, use homeGoals e awayGoals como null.

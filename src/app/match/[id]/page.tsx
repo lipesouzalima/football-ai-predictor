@@ -1,7 +1,6 @@
 import { MOCK_MATCHES, Match, getFifaRanking } from "@/lib/data";
 import { getPrediction } from "@/lib/ai";
 import { AIAnalysis } from "@/components/insights/AIAnalysis";
-import { RefreshButton } from "@/components/insights/RefreshButton";
 import { formatKickoffInBrazil, formatMatchDateInBrazil } from "@/lib/date-utils";
 import { Clock3, Sparkles } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -124,7 +123,6 @@ export default async function MatchPage(props: {
                 Leitura do jogo
               </h2>
             </div>
-            <RefreshButton />
           </div>
           <AIAnalysis data={prediction} homeColor={homeColor} awayColor={awayColor} />
         </section>

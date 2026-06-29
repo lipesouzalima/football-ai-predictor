@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Activity, Brain, HeartPulse, Lightbulb, TrendingUp, User } from "lucide-react";
+import { Activity, Brain, HeartPulse, Lightbulb, TrendingUp, User, History } from "lucide-react";
 import { PredictionData } from "@/lib/prediction-types";
 
 const cardBase =
@@ -25,11 +25,19 @@ const insights = [
     field: "impacto_desfalques" as const,
   },
   {
+    key: "historico",
+    icon: History,
+    iconColor: "text-indigo-600",
+    bgAccent: "bg-indigo-100",
+    title: "Histórico de Confrontos",
+    field: "historico_confrontos" as const,
+  },
+  {
     key: "mercado",
     icon: TrendingUp,
     iconColor: "text-amber-700",
     bgAccent: "bg-amber-100",
-    title: "Mercado",
+    title: "Previsões de Analistas",
     field: "consenso_mercado" as const,
   },
 ];
