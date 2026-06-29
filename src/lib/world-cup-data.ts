@@ -64,11 +64,15 @@ function readCache(): CacheData | null {
 }
 
 function writeCache(data: CacheData) {
-  const dir = path.dirname(CACHE_FILE);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+  try {
+    const dir = path.dirname(CACHE_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(CACHE_FILE, JSON.stringify(data, null, 2), "utf-8");
+  } catch (error) {
+    console.warn("[WorldCupData] Failed to write cache (likely read-only FS):", error);
   }
-  fs.writeFileSync(CACHE_FILE, JSON.stringify(data, null, 2), "utf-8");
 }
 
 const FLAG_MAP: Record<string, string> = {

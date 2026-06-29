@@ -1,423 +1,237 @@
 {
-  "timestamp": 1782412712343,
+  "timestamp": 1782743423358,
   "matches": [
     {
-      "id": "wc2026_20260624_COL_COD_6",
+      "id": "wc2026_20260628_RSA_CAN_0",
       "homeTeam": {
-        "name": "Colômbia",
-        "code": "COL",
-        "color": "#ffd21f",
-        "flagUrl": "https://flagcdn.com/co.svg"
-      },
-      "awayTeam": {
-        "name": "RD do Congo",
-        "code": "COD",
-        "color": "#6366f1",
-        "flagUrl": "https://flagcdn.com/cd.svg"
-      },
-      "date": "2026-06-24T07:00:00.000Z",
-      "status": "TIMED",
-      "tournament": "Copa do Mundo 2026",
-      "group": "Grupo K"
-    },
-    {
-      "id": "wc2026_20260624_SUI_CAN_0",
-      "homeTeam": {
-        "name": "Suíça",
-        "code": "SUI",
-        "color": "#ef233c",
-        "flagUrl": "https://flagcdn.com/ch.svg"
-      },
-      "awayTeam": {
-        "name": "Canadá",
-        "code": "CAN",
-        "color": "#ef233c",
-        "flagUrl": "https://flagcdn.com/ca.svg"
-      },
-      "date": "2026-06-24T19:00:00.000Z",
-      "status": "TIMED",
-      "tournament": "Copa do Mundo 2026",
-      "group": "Grupo B"
-    },
-    {
-      "id": "wc2026_20260624_BIH_QAT_1",
-      "homeTeam": {
-        "name": "Bósnia e Herzegovina",
-        "code": "BIH",
-        "color": "#1557d6",
-        "flagUrl": "https://flagcdn.com/ba.svg"
-      },
-      "awayTeam": {
-        "name": "Catar",
-        "code": "QAT",
-        "color": "#8a1538",
-        "flagUrl": "https://flagcdn.com/qa.svg"
-      },
-      "date": "2026-06-24T19:00:00.000Z",
-      "status": "TIMED",
-      "tournament": "Copa do Mundo 2026",
-      "group": "Grupo B"
-    },
-    {
-      "id": "wc2026_20260624_SCO_BRA_2",
-      "homeTeam": {
-        "name": "Escócia",
-        "code": "SCO",
-        "color": "#6366f1",
-        "flagUrl": "https://flagcdn.com/gb-sct.svg"
-      },
-      "awayTeam": {
-        "name": "Brasil",
-        "code": "BRA",
-        "color": "#18a957",
-        "flagUrl": "https://flagcdn.com/br.svg"
-      },
-      "date": "2026-06-24T22:00:00.000Z",
-      "status": "TIMED",
-      "tournament": "Copa do Mundo 2026",
-      "group": "Grupo C"
-    },
-    {
-      "id": "wc2026_20260624_MAR_HAI_3",
-      "homeTeam": {
-        "name": "Marrocos",
-        "code": "MAR",
-        "color": "#d21f3c",
-        "flagUrl": "https://flagcdn.com/ma.svg"
-      },
-      "awayTeam": {
-        "name": "Haiti",
-        "code": "HAI",
-        "color": "#d21f3c",
-        "flagUrl": "https://flagcdn.com/ht.svg"
-      },
-      "date": "2026-06-24T22:00:00.000Z",
-      "status": "TIMED",
-      "tournament": "Copa do Mundo 2026",
-      "group": "Grupo C"
-    },
-    {
-      "id": "wc2026_20260624_CZE_MEX_4",
-      "homeTeam": {
-        "name": "República Tcheca",
-        "code": "CZE",
-        "color": "#d7141a",
-        "flagUrl": "https://flagcdn.com/cz.svg"
-      },
-      "awayTeam": {
-        "name": "México",
-        "code": "MEX",
-        "color": "#0f9d58",
-        "flagUrl": "https://flagcdn.com/mx.svg"
-      },
-      "date": "2026-06-25T01:00:00.000Z",
-      "status": "TIMED",
-      "tournament": "Copa do Mundo 2026",
-      "group": "Grupo A"
-    },
-    {
-      "id": "wc2026_20260624_RSA_KOR_5",
-      "homeTeam": {
-        "name": "África do Sul",
+        "name": "South Africa",
         "code": "RSA",
         "color": "#007a4d",
         "flagUrl": "https://flagcdn.com/za.svg"
       },
       "awayTeam": {
-        "name": "Coreia do Sul",
-        "code": "KOR",
-        "color": "#e11d48",
-        "flagUrl": "https://flagcdn.com/kr.svg"
+        "name": "Canada",
+        "code": "CAN",
+        "color": "#ef233c",
+        "flagUrl": "https://flagcdn.com/ca.svg"
       },
-      "date": "2026-06-25T01:00:00.000Z",
-      "status": "TIMED",
+      "date": "2026-06-28T19:00:00.000Z",
+      "status": "FINISHED",
+      "score": {
+        "home": 0,
+        "away": 1
+      },
       "tournament": "Copa do Mundo 2026",
-      "group": "Grupo A"
+      "group": "16 avos de final"
     },
     {
-      "id": "wc2026_20260625_ECU_GER_7",
+      "id": "wc2026_20260629_BRA_JPN_1",
       "homeTeam": {
-        "name": "Equador",
-        "code": "ECU",
-        "color": "#f6c21a",
-        "flagUrl": "https://flagcdn.com/ec.svg"
+        "name": "Brazil",
+        "code": "BRA",
+        "color": "#18a957",
+        "flagUrl": "https://flagcdn.com/br.svg"
       },
       "awayTeam": {
-        "name": "Alemanha",
+        "name": "Japan",
+        "code": "JPN",
+        "color": "#f7f7f7",
+        "flagUrl": "https://flagcdn.com/jp.svg"
+      },
+      "date": "2026-06-29T17:00:00.000Z",
+      "status": "TIMED",
+      "tournament": "Copa do Mundo 2026",
+      "group": "16 avos de final"
+    },
+    {
+      "id": "wc2026_20260629_GER_PAR_2",
+      "homeTeam": {
+        "name": "Germany",
         "code": "GER",
         "color": "#121212",
         "flagUrl": "https://flagcdn.com/de.svg"
       },
-      "date": "2026-06-25T20:00:00.000Z",
+      "awayTeam": {
+        "name": "Paraguay",
+        "code": "PAR",
+        "color": "#d71920",
+        "flagUrl": "https://flagcdn.com/py.svg"
+      },
+      "date": "2026-06-29T20:30:00.000Z",
       "status": "TIMED",
       "tournament": "Copa do Mundo 2026",
-      "group": "Grupo E"
+      "group": "16 avos de final"
     },
     {
-      "id": "wc2026_20260625_CUW_CIV_8",
+      "id": "wc2026_20260629_NED_MAR_3",
       "homeTeam": {
-        "name": "Curaçao",
-        "code": "CUW",
-        "color": "#0066ff",
-        "flagUrl": "https://flagcdn.com/cw.svg"
+        "name": "Netherlands",
+        "code": "NED",
+        "color": "#ff7a18",
+        "flagUrl": "https://flagcdn.com/nl.svg"
       },
       "awayTeam": {
+        "name": "Morocco",
+        "code": "MAR",
+        "color": "#d21f3c",
+        "flagUrl": "https://flagcdn.com/ma.svg"
+      },
+      "date": "2026-06-30T01:00:00.000Z",
+      "status": "TIMED",
+      "tournament": "Copa do Mundo 2026",
+      "group": "16 avos de final"
+    },
+    {
+      "id": "wc2026_20260630_CIV_NOR_4",
+      "homeTeam": {
         "name": "Côte d'Ivoire",
         "code": "CIV",
         "color": "#ff8200",
         "flagUrl": "https://flagcdn.com/ci.svg"
       },
-      "date": "2026-06-25T20:00:00.000Z",
-      "status": "TIMED",
-      "tournament": "Copa do Mundo 2026",
-      "group": "Grupo E"
-    },
-    {
-      "id": "wc2026_20260625_JPN_SWE_9",
-      "homeTeam": {
-        "name": "Japão",
-        "code": "JPN",
-        "color": "#f7f7f7",
-        "flagUrl": "https://flagcdn.com/jp.svg"
-      },
       "awayTeam": {
-        "name": "Suécia",
-        "code": "SWE",
-        "color": "#0b76bc",
-        "flagUrl": "https://flagcdn.com/se.svg"
-      },
-      "date": "2026-06-25T23:00:00.000Z",
-      "status": "TIMED",
-      "tournament": "Copa do Mundo 2026",
-      "group": "Grupo F"
-    },
-    {
-      "id": "wc2026_20260625_TUN_NED_10",
-      "homeTeam": {
-        "name": "Tunísia",
-        "code": "TUN",
-        "color": "#e11d48",
-        "flagUrl": "https://flagcdn.com/tn.svg"
-      },
-      "awayTeam": {
-        "name": "Países Baixos",
-        "code": "NED",
-        "color": "#ff7a18",
-        "flagUrl": "https://flagcdn.com/nl.svg"
-      },
-      "date": "2026-06-25T23:00:00.000Z",
-      "status": "TIMED",
-      "tournament": "Copa do Mundo 2026",
-      "group": "Grupo F"
-    },
-    {
-      "id": "wc2026_20260626_EGY_IRN_11",
-      "homeTeam": {
-        "name": "Egito",
-        "code": "EGY",
-        "color": "#ce1126",
-        "flagUrl": "https://flagcdn.com/eg.svg"
-      },
-      "awayTeam": {
-        "name": "República Islâmica do Irã",
-        "code": "IRN",
-        "color": "#239f40",
-        "flagUrl": "https://flagcdn.com/ir.svg"
-      },
-      "date": "2026-06-26T03:00:00.000Z",
-      "status": "TIMED",
-      "tournament": "Copa do Mundo 2026",
-      "group": "Grupo G"
-    },
-    {
-      "id": "wc2026_20260626_NZL_BEL_12",
-      "homeTeam": {
-        "name": "Nova Zelândia",
-        "code": "NZL",
-        "color": "#111827",
-        "flagUrl": "https://flagcdn.com/nz.svg"
-      },
-      "awayTeam": {
-        "name": "Bélgica",
-        "code": "BEL",
-        "color": "#f2c300",
-        "flagUrl": "https://flagcdn.com/be.svg"
-      },
-      "date": "2026-06-26T03:00:00.000Z",
-      "status": "TIMED",
-      "tournament": "Copa do Mundo 2026",
-      "group": "Grupo G"
-    },
-    {
-      "id": "wc2026_20260626_TUR_USA_13",
-      "homeTeam": {
-        "name": "Turquia",
-        "code": "TUR",
-        "color": "#e30a17",
-        "flagUrl": "https://flagcdn.com/tr.svg"
-      },
-      "awayTeam": {
-        "name": "EUA",
-        "code": "USA",
-        "color": "#1d4ed8",
-        "flagUrl": "https://flagcdn.com/us.svg"
-      },
-      "date": "2026-06-26T09:00:00.000Z",
-      "status": "TIMED",
-      "tournament": "Copa do Mundo 2026",
-      "group": "Grupo D"
-    },
-    {
-      "id": "wc2026_20260626_NOR_FRA_14",
-      "homeTeam": {
-        "name": "Noruega",
+        "name": "Norway",
         "code": "NOR",
         "color": "#c8102e",
         "flagUrl": "https://flagcdn.com/no.svg"
       },
-      "awayTeam": {
-        "name": "França",
+      "date": "2026-06-30T17:00:00.000Z",
+      "status": "TIMED",
+      "tournament": "Copa do Mundo 2026",
+      "group": "16 avos de final"
+    },
+    {
+      "id": "wc2026_20260630_FRA_SWE_5",
+      "homeTeam": {
+        "name": "France",
         "code": "FRA",
         "color": "#1746d4",
         "flagUrl": "https://flagcdn.com/fr.svg"
       },
-      "date": "2026-06-26T20:00:00.000Z",
+      "awayTeam": {
+        "name": "Sweden",
+        "code": "SWE",
+        "color": "#0b76bc",
+        "flagUrl": "https://flagcdn.com/se.svg"
+      },
+      "date": "2026-06-30T21:00:00.000Z",
       "status": "TIMED",
       "tournament": "Copa do Mundo 2026",
-      "group": "Grupo I"
+      "group": "16 avos de final"
     },
     {
-      "id": "wc2026_20260626_SEN_IRQ_15",
+      "id": "wc2026_20260630_MEX_ECU_6",
       "homeTeam": {
+        "name": "Mexico",
+        "code": "MEX",
+        "color": "#0f9d58",
+        "flagUrl": "https://flagcdn.com/mx.svg"
+      },
+      "awayTeam": {
+        "name": "Ecuador",
+        "code": "ECU",
+        "color": "#f6c21a",
+        "flagUrl": "https://flagcdn.com/ec.svg"
+      },
+      "date": "2026-07-01T01:00:00.000Z",
+      "status": "TIMED",
+      "tournament": "Copa do Mundo 2026",
+      "group": "16 avos de final"
+    },
+    {
+      "id": "wc2026_20260701_ENG_COD_7",
+      "homeTeam": {
+        "name": "England",
+        "code": "ENG",
+        "color": "#f4f7fb",
+        "flagUrl": "https://flagcdn.com/gb-eng.svg"
+      },
+      "awayTeam": {
+        "name": "DR Congo",
+        "code": "COD",
+        "color": "#6366f1",
+        "flagUrl": "https://flagcdn.com/cd.svg"
+      },
+      "date": "2026-07-01T16:00:00.000Z",
+      "status": "TIMED",
+      "tournament": "Copa do Mundo 2026",
+      "group": "16 avos de final"
+    },
+    {
+      "id": "wc2026_20260701_BEL_SEN_8",
+      "homeTeam": {
+        "name": "Belgium",
+        "code": "BEL",
+        "color": "#f2c300",
+        "flagUrl": "https://flagcdn.com/be.svg"
+      },
+      "awayTeam": {
         "name": "Senegal",
         "code": "SEN",
         "color": "#16a34a",
         "flagUrl": "https://flagcdn.com/sn.svg"
       },
-      "awayTeam": {
-        "name": "Iraque",
-        "code": "IRQ",
-        "color": "#ce1126",
-        "flagUrl": "https://flagcdn.com/iq.svg"
-      },
-      "date": "2026-06-26T20:00:00.000Z",
+      "date": "2026-07-01T20:00:00.000Z",
       "status": "TIMED",
       "tournament": "Copa do Mundo 2026",
-      "group": "Grupo I"
+      "group": "16 avos de final"
     },
     {
-      "id": "wc2026_20260626_CPV_KSA_16",
+      "id": "wc2026_20260701_USA_BIH_9",
       "homeTeam": {
-        "name": "Cabo Verde",
-        "code": "CPV",
-        "color": "#2454a6",
-        "flagUrl": "https://flagcdn.com/cv.svg"
+        "name": "USA",
+        "code": "USA",
+        "color": "#1d4ed8",
+        "flagUrl": "https://flagcdn.com/us.svg"
       },
       "awayTeam": {
-        "name": "Arábia Saudita",
-        "code": "KSA",
-        "color": "#6366f1",
-        "flagUrl": "https://flagcdn.com/sa.svg"
+        "name": "Bosnia-Herzegovina",
+        "code": "BIH",
+        "color": "#1557d6",
+        "flagUrl": "https://flagcdn.com/ba.svg"
       },
-      "date": "2026-06-27T02:00:00.000Z",
+      "date": "2026-07-02T00:00:00.000Z",
       "status": "TIMED",
       "tournament": "Copa do Mundo 2026",
-      "group": "Grupo H"
+      "group": "16 avos de final"
     },
     {
-      "id": "wc2026_20260626_URU_ESP_17",
+      "id": "wc2026_20260702_ESP_AUT_10",
       "homeTeam": {
-        "name": "Uruguai",
-        "code": "URU",
-        "color": "#52a9e9",
-        "flagUrl": "https://flagcdn.com/uy.svg"
-      },
-      "awayTeam": {
-        "name": "Espanha",
+        "name": "Spain",
         "code": "ESP",
         "color": "#e11d2e",
         "flagUrl": "https://flagcdn.com/es.svg"
       },
-      "date": "2026-06-27T02:00:00.000Z",
-      "status": "TIMED",
-      "tournament": "Copa do Mundo 2026",
-      "group": "Grupo H"
-    },
-    {
-      "id": "wc2026_20260627_PAN_ENG_18",
-      "homeTeam": {
-        "name": "Panamá",
-        "code": "PAN",
-        "color": "#005293",
-        "flagUrl": "https://flagcdn.com/pa.svg"
-      },
       "awayTeam": {
-        "name": "Inglaterra",
-        "code": "ENG",
-        "color": "#f4f7fb",
-        "flagUrl": "https://flagcdn.com/gb-eng.svg"
-      },
-      "date": "2026-06-27T21:00:00.000Z",
-      "status": "TIMED",
-      "tournament": "Copa do Mundo 2026",
-      "group": "Grupo L"
-    },
-    {
-      "id": "wc2026_20260627_CRO_GHA_19",
-      "homeTeam": {
-        "name": "Croácia",
-        "code": "CRO",
-        "color": "#ef233c",
-        "flagUrl": "https://flagcdn.com/hr.svg"
-      },
-      "awayTeam": {
-        "name": "Gana",
-        "code": "GHA",
-        "color": "#facc15",
-        "flagUrl": "https://flagcdn.com/gh.svg"
-      },
-      "date": "2026-06-27T22:00:00.000Z",
-      "status": "TIMED",
-      "tournament": "Copa do Mundo 2026",
-      "group": "Grupo L"
-    },
-    {
-      "id": "wc2026_20260627_ALG_AUT_20",
-      "homeTeam": {
-        "name": "Argélia",
-        "code": "ALG",
-        "color": "#00843d",
-        "flagUrl": "https://flagcdn.com/dz.svg"
-      },
-      "awayTeam": {
-        "name": "Áustria",
+        "name": "Austria",
         "code": "AUT",
         "color": "#ed2939",
         "flagUrl": "https://flagcdn.com/at.svg"
       },
-      "date": "2026-06-28T02:00:00.000Z",
+      "date": "2026-07-02T19:00:00.000Z",
       "status": "TIMED",
       "tournament": "Copa do Mundo 2026",
-      "group": "Grupo J"
+      "group": "16 avos de final"
     },
     {
-      "id": "wc2026_20260627_JOR_ARG_21",
+      "id": "wc2026_20260702_POR_CRO_11",
       "homeTeam": {
-        "name": "Jordânia",
-        "code": "JOR",
-        "color": "#007a3d",
-        "flagUrl": "https://flagcdn.com/jo.svg"
+        "name": "Portugal",
+        "code": "POR",
+        "color": "#0a8f47",
+        "flagUrl": "https://flagcdn.com/pt.svg"
       },
       "awayTeam": {
-        "name": "Argentina",
-        "code": "ARG",
-        "color": "#58a9e8",
-        "flagUrl": "https://flagcdn.com/ar.svg"
+        "name": "Croatia",
+        "code": "CRO",
+        "color": "#ef233c",
+        "flagUrl": "https://flagcdn.com/hr.svg"
       },
-      "date": "2026-06-28T02:00:00.000Z",
+      "date": "2026-07-02T23:00:00.000Z",
       "status": "TIMED",
       "tournament": "Copa do Mundo 2026",
-      "group": "Grupo J"
+      "group": "16 avos de final"
     }
   ],
   "phase": "auto",
